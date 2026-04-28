@@ -1,11 +1,5 @@
-import express from "express";
-const app = express();
-const port = 8080;
+const app = require("./app");
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+app.listen(8080, "0.0.0.0", () => {
+  console.log("Server running");
 });
