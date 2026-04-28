@@ -8,23 +8,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. Get your code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      # 2. Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - run: npm ci
-      - run: npm test
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
 
+      # 4. Run tests (gatekeeper)
+      - name: Run tests
+        run: npm test
+
+      # 5. Build Docker image
       - name: Build Docker image
         run: docker build -t api .
 
-      - name: Log in to GHCR
+      # 6. Convert repo name to lowercase (fix your error)
+      - name: Set lowercase repo name
+        run: echo "REPO=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      # 7. Login to GitHub Container Registry
+      - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Tag image
-        run: docker tag api ghcr.io/${{ github.repository }}:latest
+      # 8. Tag image properly
+      - name: Tag Docker image
+        run: docker tag api ghcr.io/$REPO:latest
 
-      - name: Push image
-        run: docker push ghcr.io/${{ github.repository }}:latest
+      # 9. Push image to registry
+      - name: Push Docker image
+        run: docker push ghcr.io/$REPO:latest
